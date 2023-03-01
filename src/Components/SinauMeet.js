@@ -1,61 +1,101 @@
-// Import required modules
-import React, { useState, useEffect } from 'react';
-import { JitsiMeeting } from '@jitsi/react-sdk';
+import { JitsiMeeting } from "@jitsi/react-sdk";
+import React, { useRef, useState, useEffect } from "react";
+import { FaceMesh } from "@mediapipe/drawing_utils";
 
-function SinauMeet(props) {
-  const [displayName, setDisplayName] = useState(''); // Display name of the user
-  const [roomName, setRoomName] = useState(''); // Room name
-  const [password, setPassword] = useState(''); // Password for the room
-  const [isMeetingStarted, setIsMeetingStarted] = useState(false); // Check if the meeting has started
+import Webcam from "react-webcam";
+import * as cam from "@mediapipe/camera_utils";
 
-  useEffect(() => {
-    // Set the display name and room name
-    setDisplayName(props.displayName);
-    setRoomName(props.roomName);
-    setPassword(props.password);
-    setIsMeetingStarted(true);
-  }, [props.displayName, props.roomName, props.password]);
+import * as Facemesh from "@mediapipe/face_mesh";
+import "@tensorflow/tfjs";
+import "@tensorflow/tfjs-backend-webgl";
 
-  const options = {
-    roomName: roomName, // Name of the room to join
-    displayName: displayName, // Display name of the user
-    password: password // Password for the room
+const SinauMeet = () => {
+
+
+  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
+  const [jitsiRoom, setJitsiRoom] = useState('');
+ 
+
+
+  const handleVideoLoadedData = () => {
+    setIsVideoLoaded(true);
   };
 
-  const interfaceConfig = {
-    filmStripOnly: false,
-    SHOW_WATERMARK_FOR_GUESTS: false,
-    DEFAULT_REMOTE_DISPLAY_NAME: 'Guest',
-    JITSI_WATERMARK_LINK: 'https://your-link.com',
-    SHOW_BRAND_WATERMARK: false,
-    TOOLBAR_BUTTONS: [
-      'microphone', 'camera', 'closedcaptions', 'desktop', 
-      'fullscreen', 'fodeviceselection', 'hangup', 'profile', 
-      'chat', 'recording', 'livestreaming', 'etherpad', 'sharedvideo', 
-      'settings', 'raisehand', 'videoquality', 'filmstrip', 'invite', 
-      'feedback', 'stats', 'shortcuts', 'tileview', 'download', 'help', 
-      'mute-everyone', 'e2ee'
-    ],
-    DISABLE_VIDEO_BACKGROUND: true,
-    SHOW_JITSI_WATERMARK: false
+  const handleJitsiMeetStatusChanged = (status) => {
+    console.log(`Jitsi Meet status changed to: ${status}`);
   };
+
+  const handleJitsiMeetError = (error) => {
+    console.log(`Jitsi Meet error: ${error}`);
+  };
+
+  const handleJitsiMeetReady = () => {
+    console.log('Jitsi Meet is ready');
+  };
+
+  const handleJitsiMeetVideoConferenceJoined = (response) => {
+    console.log(`Jitsi Meet video conference joined: ${response}`);
+  };
+
+  const handleJitsiMeetVideoConferenceLeft = (response) => {
+    console.log(`Jitsi Meet video conference left: ${response}`);
+  };
+
+  const handleJitsiMeetVideoConferenceJoinedError = (error) => {
+    console.log(`Jitsi Meet video conference joined error: ${error}`);
+  };
+
+
+
+  const apiRef = useRef();
 
   return (
+    <>
     <div>
-      { isMeetingStarted ? (
-       <JitsiMeeting
-       configOverwrite = {{
-           startWithAudioMuted: true,
-           hiddenPremeetingButtons: ['microphone']
-       }}
-       roomName = { 'YOUR_CUSTOM_ROOM_NAME' }
-       getIFrameRef = { (iframeRef) => { iframeRef.style.height = '800px';} }
-   />
-      ) : (
-        <div>Loading...</div>
-      )}
-    </div>
-  );
-}
 
+      <JitsiMeeting
+        domain="meet.jit.si"
+        roomName="NAMA SESUAI ABSEN"
+        configOverwrite={{
+          startWithAudioMuted: true,
+          disableModeratorIndicator: true,
+          startScreenSharing: true,
+          enableEmailInStats: false,
+          enableLobbyChat: true,
+          enableFaceCentering: true,
+          enableFaceExpressionsDetection: true,
+          enableDisplayFaceExpressions: true,
+          enableRTCStats: true,
+          aceCenteringThreshold: 10,
+          captureInterval: 1000,
+        }}
+        interfaceConfigOverwrite={{
+          DISPLAY_WELCOME_PAGE_CONTENT: true,
+          DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+          SHOW_CHROME_EXTENSION_BANNER: false,
+
+          SHOW_JITSI_WATERMARK: false,
+          SHOW_POWERED_BY: false,
+          SHOW_PROMOTIONAL_CLOSE_PAGE: false,
+        }}
+        userInfo={{
+          displayName: "YOUR_USERNAME",
+        }}
+        onApiReady={(externalApi) => {
+          externalApi.executeCommands("toggleSubtitles");
+        }}
+        getIFrameRef={(iframeRef) => {
+          iframeRef.style.height = "800px";
+        }}
+        onMeetingStatusChanged={handleJitsiMeetStatusChanged}
+        onError={handleJitsiMeetError}
+        onReady={handleJitsiMeetReady}
+        onVideoConferenceJoined={handleJitsiMeetVideoConferenceJoined}
+      >
+        <FaceMesh />
+      </JitsiMeeting>
+    </div>
+    </>
+  );
+};
 export default SinauMeet;
