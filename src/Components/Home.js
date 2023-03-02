@@ -10,7 +10,6 @@ const Home = () => {
     <>
       <div>
         <Calendar />
-        <app/>
       </div>
     </>
   );

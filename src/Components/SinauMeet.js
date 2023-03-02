@@ -6,6 +6,9 @@ import { FaceMesh } from "@mediapipe/face_mesh";
 import * as Facemesh from "@mediapipe/face_mesh";
 import "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
+import db from './Firebase';
+import { redirect, useNavigate } from 'react-router-dom';
+import {  collection, doc, updateDoc, setDoc } from "firebase/firestore";
 
 const SinauMeet = () => {
 
@@ -14,6 +17,7 @@ const SinauMeet = () => {
   var camera = null;
   const connect = window.drawConnectors;
   const [usingExternalCam, setUsingExternalCam] = useState(false);
+  const navigate = useNavigate()
 
   const euclideanDistance = (point1, point2) => {
     const a = point1.x - point2.x;
@@ -29,11 +33,31 @@ const SinauMeet = () => {
 
   let scoreSecond = [];
 
-  const getAverage = () => {
+  const getAverage = async() => {
     const avg = scoreSecond.reduce((a, b) => a + b, 0) / scoreSecond.length;
     console.log(`Average: ${avg}`);
     const averageElement = document.querySelector(".average");
     averageElement.textContent = `Average: ${avg}`;
+
+    for (let i = 0; i < scoreSecond.length; i++) {
+    const docRef = doc(collection(db, "Farhan22"));
+    const data = {
+      [i + 1]: {
+        score: scoreSecond[i],
+        second: i + 1,
+      },
+    };
+    updateDoc(docRef, data);
+    console.log(updateDoc)
+  }
+
+  setTimeout(() => {
+      navigate('/Home')
+      
+    }, 10000);
+    
+  
+
   };
 
   function onResults(results) {
