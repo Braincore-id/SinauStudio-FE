@@ -1,6 +1,5 @@
 import { initializeApp } from "firebase/app";
-import { getFirestore } from "firebase/firestore";
-import { collection, addDoc } from "firebase/firestore";
+import { Firestore, getFirestore } from "firebase/firestore";
 
 // TODO: Add SDKs for Firebase products that you want to use
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -23,16 +22,4 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-async function InsertToFirestore(avg) {
-  try {
-    const docRef = await addDoc(collection(db, "users"), {
-      avg: avg,
-    });
-    console.log("Document written with ID: ", docRef.id);
-    console.log("berhasilllllll");
-  } catch (e) {
-    console.error("Error adding document: ", e);
-  }
-}
-
-export default InsertToFirestore;
+export default db;

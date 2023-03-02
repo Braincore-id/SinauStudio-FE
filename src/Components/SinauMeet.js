@@ -6,7 +6,8 @@ import { FaceMesh } from "@mediapipe/face_mesh";
 import * as Facemesh from "@mediapipe/face_mesh";
 import "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
-import InsertToFirestore from "./Firebase";
+import db from "./Firebase";
+import { doc, updateDoc, setDoc } from "@firebase/firestore";
 
 const SinauMeet = () => {
   const webcamRef = useRef(null);
@@ -29,12 +30,29 @@ const SinauMeet = () => {
 
   let scoreSecond = [];
 
-  const getAverage = () => {
-    const avg = scoreSecond.reduce((a, b) => a + b, 0) / scoreSecond.length;
-    // console.log(`Average: ${avg}`);
-    const averageElement = document.querySelector(".average");
-    averageElement.textContent = `Average: ${avg}`;
-    InsertToFirestore(avg);
+  const getAverage = async () => {
+    try {
+      const avg = scoreSecond.reduce((a, b) => a + b, 0) / scoreSecond.length;
+      const averageElement = document.querySelector(".average");
+      averageElement.textContent = `Average: ${avg}`;
+
+      await setDoc(doc(db, "SinauStudio", "TINIS"), {
+        name: "TINI",
+      });
+
+      for (let i = 0; i < scoreSecond.length; i++) {
+        const docRef = await doc(db, "SinauStudio", "TINIS");
+        const data = {
+          [i + 1]: {
+            score: scoreSecond[i],
+            second: i + 1,
+          },
+        };
+        updateDoc(docRef, data);
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   function onResults(results) {
@@ -99,8 +117,6 @@ const SinauMeet = () => {
         } else {
           scoreSecond.push(0);
         }
-
-        // console.log(scoreSecond);
 
         connect(canvasCtx, landmarks, Facemesh.FACEMESH_RIGHT_EYE, {
           color: "#30FF30",
