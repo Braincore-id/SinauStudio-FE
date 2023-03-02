@@ -1,8 +1,12 @@
 import React from "react";
 import Navbar from "./Navbar";
 import { BiCaretLeft } from "react-icons/bi";
+import { useNavigate } from "react-router-dom";
 
 const Meet = () => {
+
+  const navigate = useNavigate()
+
   return (
     <>
       <div className=" bg-cyan-800">
@@ -46,10 +50,10 @@ const Meet = () => {
             <div className="divider py-10 px-10">On Going</div>
             <div className="flex flex-col items-center gap-5">
               <button
-                placeholder="Mekanisme Python"
                 className="btn btn-secondary w-full max-w-xs"
+                onClick={() => navigate('/SinauMeet')}
               >
-                Matematika
+                Matematika Wajib
               </button>
             </div>
             <div className="divider py-10 px-10">Coming Soon</div>
