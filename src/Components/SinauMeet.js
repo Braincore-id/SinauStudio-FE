@@ -1,101 +1,262 @@
-import { JitsiMeeting } from "@jitsi/react-sdk";
-import React, { useRef, useState, useEffect } from "react";
-import { FaceMesh } from "@mediapipe/drawing_utils";
-
+import { JitsiMeeting } from '@jitsi/react-sdk';
+import React, { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 import * as cam from "@mediapipe/camera_utils";
-
+import { FaceMesh } from "@mediapipe/face_mesh";
 import * as Facemesh from "@mediapipe/face_mesh";
 import "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
 
 const SinauMeet = () => {
 
+  const webcamRef = useRef(null);
+  const canvasRef = useRef(null);
+  var camera = null;
+  const connect = window.drawConnectors;
+  const [usingExternalCam, setUsingExternalCam] = useState(false);
 
-  const [isVideoLoaded, setIsVideoLoaded] = useState(false);
-  const [jitsiRoom, setJitsiRoom] = useState('');
- 
-
-
-  const handleVideoLoadedData = () => {
-    setIsVideoLoaded(true);
+  const euclideanDistance = (point1, point2) => {
+    const a = point1.x - point2.x;
+    const b = point1.y - point2.y;
+    const c = Math.sqrt(a * a + b * b);
+    return c;
   };
 
-  const handleJitsiMeetStatusChanged = (status) => {
-    console.log(`Jitsi Meet status changed to: ${status}`);
+  const checkCloseEye = (distanceLeft, distanceRight) => {
+    if (distanceLeft < 0.01 || distanceRight < 0.01) return true;
+    return false;
   };
 
-  const handleJitsiMeetError = (error) => {
-    console.log(`Jitsi Meet error: ${error}`);
+  let scoreSecond = [];
+
+  const getAverage = () => {
+    const avg = scoreSecond.reduce((a, b) => a + b, 0) / scoreSecond.length;
+    console.log(`Average: ${avg}`);
+    const averageElement = document.querySelector(".average");
+    averageElement.textContent = `Average: ${avg}`;
   };
 
-  const handleJitsiMeetReady = () => {
-    console.log('Jitsi Meet is ready');
-  };
+  function onResults(results) {
+    console.log(results);
+    //console.log(Facemesh.FACEMESH_RIGHT_EYE);
 
-  const handleJitsiMeetVideoConferenceJoined = (response) => {
-    console.log(`Jitsi Meet video conference joined: ${response}`);
-  };
+    //Setting height and width of canvas
+    canvasRef.current.width = webcamRef.current.video.videoWidth;
+    canvasRef.current.height = webcamRef.current.video.videoHeight;
 
-  const handleJitsiMeetVideoConferenceLeft = (response) => {
-    console.log(`Jitsi Meet video conference left: ${response}`);
-  };
+    const canvasElement = canvasRef.current;
+    const canvasCtx = canvasElement.getContext("2d");
+    canvasCtx.save();
 
-  const handleJitsiMeetVideoConferenceJoinedError = (error) => {
-    console.log(`Jitsi Meet video conference joined error: ${error}`);
-  };
+    canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+    canvasCtx.drawImage(
+      results.image,
+      0,
+      0,
+      canvasElement.width,
+      canvasElement.height
+    );
+
+    //console.log(Facemesh.FACEMESH_FACE_OVAL);
+
+    if (results.multiFaceLandmarks) {
+      for (const landmarks of results.multiFaceLandmarks) {
+        let arr = [];
+        arr.push(landmarks[159].z);
+        arr.push(landmarks[145].z);
+        arr.push(landmarks[386].z);
+        arr.push(landmarks[374].z);
+
+        let studentFocus = true;
+
+        for (let i = 0; i < arr.length; i++) {
+          // console.log(arr[i]);
+          if (arr[i] < -0.027 || arr[i] > 0.027) {
+            studentFocus = false;
+          }
+        }
+
+        // Get Point on left Eye
+        const pointTopLeft = landmarks[159];
+        const pointBottomLeft = landmarks[145];
+        const distanceLeft = euclideanDistance(pointTopLeft, pointBottomLeft);
+
+        // Get Point on right Eye
+        const pointTopRight = landmarks[386];
+        const pointBottomRight = landmarks[374];
+        const distance_right = euclideanDistance(
+          pointTopRight,
+          pointBottomRight
+        );
+
+        const close_eyes = checkCloseEye(distanceLeft, distance_right);
+
+        if (close_eyes) studentFocus = false;
+
+        if (studentFocus) {
+          scoreSecond.push(10);
+        } else {
+          scoreSecond.push(0);
+        }
+
+        console.log(scoreSecond);
+
+        connect(canvasCtx, landmarks, Facemesh.FACEMESH_RIGHT_EYE, {
+          color: "#30FF30",
+          lineWidth: 1,
+        });
+        connect(canvasCtx, landmarks, Facemesh.FACEMESH_RIGHT_EYEBROW, {
+          color: "#30FF30",
+          lineWidth: 1,
+        });
+        connect(canvasCtx, landmarks, Facemesh.FACEMESH_RIGHT_IRIS, {
+          color: "#30FF30",
+          lineWidth: 1,
+        });
+        connect(canvasCtx, landmarks, Facemesh.FACEMESH_LEFT_EYE, {
+          color: "#30FF30",
+          lineWidth: 1,
+        });
+        connect(canvasCtx, landmarks, Facemesh.FACEMESH_LEFT_EYEBROW, {
+          color: "#30FF30",
+          lineWidth: 1,
+        });
+        connect(canvasCtx, landmarks, Facemesh.FACEMESH_LEFT_IRIS, {
+          color: "#30FF30",
+          lineWidth: 1,
+        });
+        connect(canvasCtx, landmarks, Facemesh.FACEMESH_FACE_OVAL, {
+          color: "#E0E0E0",
+          lineWidth: 1,
+        });
+        connect(canvasCtx, landmarks, Facemesh.FACEMESH_LIPS, {
+          color: "#FF3030",
+          lineWidth: 1,
+        });
+      }
+    }
+  }
+
+  useEffect(() => {
+    const faceMesh = new FaceMesh({
+      locateFile: (file) => {
+        return `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${file}`;
+      },
+    });
+
+    faceMesh.setOptions({
+      maxNumFaces: 1,
+      refineLandmarks: true,
+      minDetectionConfidence: 0.5,
+      minTrackingConfidence: 0.5,
+      selfieMode: true,
+    });
+
+    faceMesh.onResults(onResults);
+
+    if (
+      typeof webcamRef !== "undefined" &&
+      webcamRef !== null
+    ) {
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      const videoConstraints = {
+        // untuk memakai webcam external
+        facingMode: usingExternalCam ? "user" : "environment", width: 1280, height: 720 // ganti deviceID or URL dengan nilai yang sesuai
+      };
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+      camera = new cam.Camera(webcamRef.current.video, {
+        video: videoConstraints,
+        onFrame: async () => {
+          await faceMesh.send({
+            image: webcamRef.current.video,
+          });
+        },
+        width: 1280,
+        height: 720,
+      });
+    }
+    camera.start();
+  }, []);
 
 
 
-  const apiRef = useRef();
+  
 
   return (
     <>
-    <div>
-
-      <JitsiMeeting
-        domain="meet.jit.si"
-        roomName="NAMA SESUAI ABSEN"
-        configOverwrite={{
-          startWithAudioMuted: true,
-          disableModeratorIndicator: true,
-          startScreenSharing: true,
-          enableEmailInStats: false,
-          enableLobbyChat: true,
-          enableFaceCentering: true,
-          enableFaceExpressionsDetection: true,
-          enableDisplayFaceExpressions: true,
-          enableRTCStats: true,
-          aceCenteringThreshold: 10,
-          captureInterval: 1000,
+    <JitsiMeeting
+    domain = 'meet.jit.si'
+    roomName = "PleaseUseAGoodRoomName"
+    configOverwrite = {{
+        startWithAudioMuted: true,
+        disableModeratorIndicator: true,
+        startScreenSharing: true,
+        enableEmailInStats: false
+    }}
+    interfaceConfigOverwrite = {{
+        DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
+    }}
+    userInfo = {{
+        displayName: 'farhan'
+    }}
+    onApiReady = { (externalApi) => {
+        // here you can attach custom event listeners to the Jitsi Meet External API
+        // you can also store it locally to execute commands
+    } }
+    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '800px'; } }
+/>
+<Webcam
+        ref={webcamRef}
+        style={{
+          position: "absolute",
+          marginRight: "auto",
+          marginLeft: "auto",
+          left: "0",
+          right: "0",
+          textAlign: "center",
+          zIndex: "9",
+          width: 640,
+          height: 480,
         }}
-        interfaceConfigOverwrite={{
-          DISPLAY_WELCOME_PAGE_CONTENT: true,
-          DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-          SHOW_CHROME_EXTENSION_BANNER: false,
-
-          SHOW_JITSI_WATERMARK: false,
-          SHOW_POWERED_BY: false,
-          SHOW_PROMOTIONAL_CLOSE_PAGE: false,
+        hidden
+      />
+      <canvas
+      hidden
+        ref={canvasRef}
+        style={{
+          position: "absolute",
+          marginRight: "auto",
+          marginLeft: "auto",
+          left: "0",
+          right: "0",
+          textAlign: "center",
+          zIndex: "9",
+          width: 640,
+          height: 480,
         }}
-        userInfo={{
-          displayName: "YOUR_USERNAME",
+      ></canvas>
+      <button
+        style={{
+          position: "absolute",
+          bottom: "20px",
+          background: "transparent",
+          textAlign: "center",
+          zIndex: "11",
         }}
-        onApiReady={(externalApi) => {
-          externalApi.executeCommands("toggleSubtitles");
-        }}
-        getIFrameRef={(iframeRef) => {
-          iframeRef.style.height = "800px";
-        }}
-        onMeetingStatusChanged={handleJitsiMeetStatusChanged}
-        onError={handleJitsiMeetError}
-        onReady={handleJitsiMeetReady}
-        onVideoConferenceJoined={handleJitsiMeetVideoConferenceJoined}
+        onClick={() => setUsingExternalCam(!usingExternalCam)}
       >
-        <FaceMesh />
-      </JitsiMeeting>
-    </div>
+        Change Camera
+      </button>
+      <div className=" flex">
+        <button onClick={getAverage} type="" className=" bg-blue-400 p-4 rounded-xl text-white">
+          get average
+        </button>
+      </div>
+      <div className=" flex">
+        <h1 className="average text-4xl text-black"></h1>
+      </div>
     </>
-  );
-};
-export default SinauMeet;
+  )
+}
+
+export default SinauMeet
