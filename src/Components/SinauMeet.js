@@ -1,4 +1,4 @@
-import { JitsiMeeting } from '@jitsi/react-sdk';
+import { JitsiMeeting } from "@jitsi/react-sdk";
 import React, { useRef, useEffect, useState } from "react";
 import Webcam from "react-webcam";
 import * as cam from "@mediapipe/camera_utils";
@@ -6,9 +6,9 @@ import { FaceMesh } from "@mediapipe/face_mesh";
 import * as Facemesh from "@mediapipe/face_mesh";
 import "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
+import InsertToFirestore from "./Firebase";
 
 const SinauMeet = () => {
-
   const webcamRef = useRef(null);
   const canvasRef = useRef(null);
   var camera = null;
@@ -31,13 +31,14 @@ const SinauMeet = () => {
 
   const getAverage = () => {
     const avg = scoreSecond.reduce((a, b) => a + b, 0) / scoreSecond.length;
-    console.log(`Average: ${avg}`);
+    // console.log(`Average: ${avg}`);
     const averageElement = document.querySelector(".average");
     averageElement.textContent = `Average: ${avg}`;
+    InsertToFirestore(avg);
   };
 
   function onResults(results) {
-    console.log(results);
+    // console.log(results);
     //console.log(Facemesh.FACEMESH_RIGHT_EYE);
 
     //Setting height and width of canvas
@@ -99,7 +100,7 @@ const SinauMeet = () => {
           scoreSecond.push(0);
         }
 
-        console.log(scoreSecond);
+        // console.log(scoreSecond);
 
         connect(canvasCtx, landmarks, Facemesh.FACEMESH_RIGHT_EYE, {
           color: "#30FF30",
@@ -154,14 +155,13 @@ const SinauMeet = () => {
 
     faceMesh.onResults(onResults);
 
-    if (
-      typeof webcamRef !== "undefined" &&
-      webcamRef !== null
-    ) {
+    if (typeof webcamRef !== "undefined" && webcamRef !== null) {
       // eslint-disable-next-line react-hooks/exhaustive-deps
       const videoConstraints = {
         // untuk memakai webcam external
-        facingMode: usingExternalCam ? "user" : "environment", width: 1280, height: 720 // ganti deviceID or URL dengan nilai yang sesuai
+        facingMode: usingExternalCam ? "user" : "environment",
+        width: 1280,
+        height: 720, // ganti deviceID or URL dengan nilai yang sesuai
       };
       // eslint-disable-next-line react-hooks/exhaustive-deps
       camera = new cam.Camera(webcamRef.current.video, {
@@ -178,34 +178,32 @@ const SinauMeet = () => {
     camera.start();
   }, []);
 
-
-
-  
-
   return (
     <>
-    <JitsiMeeting
-    domain = 'meet.jit.si'
-    roomName = "PleaseUseAGoodRoomName"
-    configOverwrite = {{
-        startWithAudioMuted: true,
-        disableModeratorIndicator: true,
-        startScreenSharing: true,
-        enableEmailInStats: false
-    }}
-    interfaceConfigOverwrite = {{
-        DISABLE_JOIN_LEAVE_NOTIFICATIONS: true
-    }}
-    userInfo = {{
-        displayName: 'farhan'
-    }}
-    onApiReady = { (externalApi) => {
-        // here you can attach custom event listeners to the Jitsi Meet External API
-        // you can also store it locally to execute commands
-    } }
-    getIFrameRef = { (iframeRef) => { iframeRef.style.height = '800px'; } }
-/>
-<Webcam
+      <JitsiMeeting
+        domain="meet.jit.si"
+        roomName="PleaseUseAGoodRoomName"
+        configOverwrite={{
+          startWithAudioMuted: true,
+          disableModeratorIndicator: true,
+          startScreenSharing: true,
+          enableEmailInStats: false,
+        }}
+        interfaceConfigOverwrite={{
+          DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+        }}
+        userInfo={{
+          displayName: "farhan",
+        }}
+        onApiReady={(externalApi) => {
+          // here you can attach custom event listeners to the Jitsi Meet External API
+          // you can also store it locally to execute commands
+        }}
+        getIFrameRef={(iframeRef) => {
+          iframeRef.style.height = "800px";
+        }}
+      />
+      <Webcam
         ref={webcamRef}
         style={{
           position: "absolute",
@@ -221,7 +219,7 @@ const SinauMeet = () => {
         hidden
       />
       <canvas
-      hidden
+        hidden
         ref={canvasRef}
         style={{
           position: "absolute",
@@ -248,7 +246,11 @@ const SinauMeet = () => {
         Change Camera
       </button>
       <div className=" flex">
-        <button onClick={getAverage} type="" className=" bg-blue-400 p-4 rounded-xl text-white">
+        <button
+          onClick={getAverage}
+          type=""
+          className=" bg-blue-400 p-4 rounded-xl text-white"
+        >
           get average
         </button>
       </div>
@@ -256,7 +258,7 @@ const SinauMeet = () => {
         <h1 className="average text-4xl text-black"></h1>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default SinauMeet
+export default SinauMeet;
