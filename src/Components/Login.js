@@ -1,5 +1,6 @@
 import axios from "axios";
 import React,{ useState } from "react";
+import { useCookies } from "react-cookie";
 import { redirect, useNavigate } from "react-router-dom";
 
 
@@ -11,11 +12,12 @@ const Login = () => {
   const [user] = useState("");
   const apiURL = 'https://a025-2001-448a-2003-6db8-e946-22f3-cf3c-58dd.ap.ngrok.io/api/v.1';
   const navigate = useNavigate()
+   const [cookies, setCookie] = useCookies(['name']);
 
 
   async function handleSubmit() {
     try {
-      let response = await axios
+      await axios
         .post(
           `${apiURL}/auth/login`,
           {
@@ -24,7 +26,8 @@ const Login = () => {
           }
         )
         .then((response) => {
-          console.log(response.data);
+          console.log(response.data)
+          
           navigate('/Home')
         });
     } catch (e) {

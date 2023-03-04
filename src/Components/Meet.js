@@ -64,8 +64,39 @@ const Meet = () => {
             <div className=" pt-5 pb-5">
               <h1 className=" text-center ">VIDEO MEET</h1>
             </div>
+           
+            <div className="divider py-10 px-10">On Going</div>
+            <div className="flex flex-col items-center gap-5">
+              <button
+                className="btn btn-secondary w-full max-w-xs"
+                onClick={() => navigate("/SinauMeet")}
+              >
+                Matematika Wajib
+              </button>
+            </div>
+            <div className="divider py-10 px-10">Coming Soon</div>
+            <div className="flex flex-col items-center gap-5 pb-10">
+              <button
+                placeholder="Mekanisme Python"
+                className="btn btn-secondary w-full max-w-xs"
+              >
+                Matematika Peminatan
+              </button>
+              <button
+                placeholder="Gerak Lurus Beraturan"
+                className="btn btn-secondary w-full max-w-xs"
+              >
+                Algoritma Pemrograman
+              </button>
+              <button
+                placeholder="Fungsi Chipset Komputer"
+                className="btn btn-secondary w-full max-w-xs"
+              >
+                Perakitan Komputer
+              </button>
+            </div>
             <div className="divider py-10 px-10">Finished</div>
-            <div className="flex flex-row justify-center items-center gap-5">
+            <div className="flex flex-row justify-center items-center gap-5 mb-10">
               <button
                 className="btn btn-secondary w-full max-w-xs"
                 onClick={() => navigate("/SinauMeet")}
@@ -84,36 +115,6 @@ const Meet = () => {
                   <path d="M13 8V2H7v6H2l8 8 8-8h-5zM0 18h20v2H0v-2z" />
                 </svg>
                 <span>Download</span>
-              </button>
-            </div>
-            <div className="divider py-10 px-10">On Going</div>
-            <div className="flex flex-col items-center gap-5">
-              <button
-                className="btn btn-secondary w-full max-w-xs"
-                onClick={() => navigate("/SinauMeet")}
-              >
-                Matematika Wajib
-              </button>
-            </div>
-            <div className="divider py-10 px-10">Coming Soon</div>
-            <div className="flex flex-col items-center gap-5 pb-10">
-              <button
-                placeholder="Mekanisme Python"
-                className="btn btn-secondary w-full max-w-xs"
-              >
-                Matematika
-              </button>
-              <button
-                placeholder="Gerak Lurus Beraturan"
-                className="btn btn-secondary w-full max-w-xs"
-              >
-                Algoritma Pemrograman
-              </button>
-              <button
-                placeholder="Fungsi Chipset Komputer"
-                className="btn btn-secondary w-full max-w-xs"
-              >
-                Perakitan Komputer
               </button>
             </div>
           </div>

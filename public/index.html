@@ -24,7 +24,7 @@
 
 <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
 <script defer src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-
+<script src="https://www.gstatic.com/dialogflow-console/fast/messenger/bootstrap.js?v=1"></script>
 
 <script defer src="./init-firebase.js"></script>
     <!--
@@ -41,6 +41,32 @@
   <body>
     <noscript>You need to enable JavaScript to run this app.</noscript>
     <div id="root"></div>
+    <df-messenger
+    chat-icon="./travbot.png"
+      intent="WELCOME"
+      chat-title="Pinbot"
+      agent-id="4321547c-7a14-40f8-94a9-12dcffb1adae"
+      language-code="id"
+    ></df-messenger>
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+    <script>
+      $(document).ready(function () {
+        window.addEventListener("dfMessengerLoaded", function (event) {
+          $r1 = document.querySelector("df-messenger");
+          $r2 = $r1.shadowRoot.querySelector("df-messenger-chat");
+          $r3 = $r2.shadowRoot.querySelector("df-messenger-user-input");
+          var sheet = new CSSStyleSheet();
+          sheet.replaceSync(
+            `div.chat-wrapper[opened="true"] { height: 440px }`
+          );
+          $r2.shadowRoot.adoptedStyleSheets = [sheet];
+        });
+      });
+    </script>
     <!--
       This HTML file is a template.
       If you open it directly in the browser, you will see an empty page.

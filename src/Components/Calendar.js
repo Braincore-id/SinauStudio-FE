@@ -1,9 +1,11 @@
 import { useState } from "react";
 import Navbar from "./Navbar";
+import { useNavigate } from "react-router-dom";
 
 function Calendar() {
   const days = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
   const [selectedDate, setSelectedDate] = useState(new Date());
+  const navigate = useNavigate();
 
   // function to get the days in a month
   function getDaysInMonth(month, year) {
@@ -35,10 +37,9 @@ function Calendar() {
 
   return (
     <>
-    <div>
-      
-      <Navbar />
-    </div>
+      <div>
+        <Navbar />
+      </div>
       <div className=" flex flex-col items-center w-screen pt-16 min-h-screen  bg-blue-900 overflow-hidden">
         <div className=" flex justify-between">
           <div className="p-4 text-start">
@@ -124,36 +125,36 @@ function Calendar() {
               <h1>HARI INI</h1>
             </div>
             <div>
-                <h1>28 Februari 2023</h1>
+              <h1>28 Februari 2023</h1>
             </div>
           </div>
         </div>
         <div className="divider"></div>
-        <div className="  flex-row justify-start grid grid-cols-2 gap-5 pr-5 pb-10 pt-10 w-screen pl-10 overflow-hidden">
-          <textarea
-            className="textarea textarea-primary xl:w-[90%] w-[100%] xl:h-[100px] h-[100%]"
-            placeholder="Bio"
-          ></textarea>
-          <textarea
-            className="textarea textarea-primary xl:w-[90%] w-[100%] xl:h-[100px] h-[100%]"
-            placeholder="Bio"
-          ></textarea>
-          <textarea
-            className="textarea textarea-primary xl:w-[90%] w-[100%] xl:h-[100px] h-[100%]"
-            placeholder="Bio"
-          ></textarea>
-          <textarea
-            className="textarea textarea-primary xl:w-[90%] w-[100%] xl:h-[100px] h-[100%]"
-            placeholder="Bio"
-          ></textarea>
-          <textarea
-            className="textarea textarea-primary xl:w-[90%] w-[100%] xl:h-[100px] h-[100%]"
-            placeholder="Bio"
-          ></textarea>
-          <textarea
-            className="textarea textarea-primary xl:w-[90%] w-[100%] xl:h-[100px] h-[100%]"
-            placeholder="Bio"
-          ></textarea>
+        <div className="  flex-row justify-center grid grid-cols-2 gap-5 pr-5 pb-10 pt-10 pl-10 overflow-hidden">
+          <button
+            className="btn btn-secondary w-[500px] max-w-lg"
+            onClick={() => navigate("/Meet")}
+          >
+            Matematika Wajib
+          </button>
+          <button
+            className="btn btn-secondary w-[500px] max-w-lg"
+            onClick={() => navigate("/Meet")}
+          >
+            Matematika Peminatan
+          </button>
+          <button
+            className="btn btn-secondary w-[500px] max-w-lg"
+            onClick={() => navigate("/Meet")}
+          >
+            Algoritma Pemrograman
+          </button>
+          <button
+            className="btn btn-secondary w-[500px] max-w-lg"
+            onClick={() => navigate("/Meet")}
+          >
+            Perakitan Komputer
+          </button>
         </div>
       </div>
     </>
