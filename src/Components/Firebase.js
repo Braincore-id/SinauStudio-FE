@@ -7,15 +7,14 @@ import { Firestore, getFirestore } from "firebase/firestore";
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 const firebaseConfig = {
-  apiKey: "AIzaSyC-5rzrHKBnuMuihZ-m_oOEUKbg4QQkS4U",
-  authDomain: "attention-studio.firebaseapp.com",
+  apiKey: "AIzaSyCbujcGi2d-S3ib1tqBhMn-lgpJw525Voo",
+  authDomain: "sinaustudio-2e747.firebaseapp.com",
   databaseURL:
-    "https://attention-studio-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "attention-studio",
-  storageBucket: "attention-studio.appspot.com",
-  messagingSenderId: "985346975544",
-  appId: "1:985346975544:web:b2b44863ae786450c583cd",
-  measurementId: "G-6C6PN737XZ",
+    "https://sinaustudio-2e747-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "sinaustudio-2e747",
+  storageBucket: "sinaustudio-2e747.appspot.com",
+  messagingSenderId: "225301022100",
+  appId: "1:225301022100:web:a2051f00f0282bdbdfbb81",
 };
 
 // Initialize Firebase

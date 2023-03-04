@@ -9,6 +9,8 @@ import "@tensorflow/tfjs-backend-webgl";
 import db from "./Firebase";
 import { doc, updateDoc, setDoc } from "@firebase/firestore";
 import { useNavigate } from "react-router-dom";
+import { useCookies } from "react-cookie";
+import jwt_decode from "jwt-decode";
 
 const SinauMeet = () => {
   const webcamRef = useRef(null);
@@ -16,7 +18,8 @@ const SinauMeet = () => {
   var camera = null;
   const connect = window.drawConnectors;
   const [usingExternalCam, setUsingExternalCam] = useState(false);
-  const navigate = useNavigate()
+  const navigate = useNavigate();
+  const [cookies] = useCookies("token");
   const [isLoading, setIsLoading] = useState(false);
 
   const euclideanDistance = (point1, point2) => {
@@ -33,18 +36,25 @@ const SinauMeet = () => {
 
   let scoreSecond = [];
 
+  const JWTDecode = (token) => {
+    return jwt_decode(token);
+  };
+
   const getAverage = async () => {
     try {
-      const avg = scoreSecond.reduce((a, b) => a + b, 0) / scoreSecond.length;
-      const averageElement = document.querySelector(".average");
-      averageElement.textContent = `Average: ${avg}`;
+      const userInfo = JWTDecode(cookies.token);
+      const endSession = document.querySelector(".endsession");
+      endSession.textContent = `Direct to Home with 5 seconds.`;
 
-      await setDoc(doc(db, "SinauStudio", "Hanhan"), {
-        name: "Hanhan",
+      const avg = scoreSecond.reduce((a, b) => a + b, 0) / scoreSecond.length;
+
+      await setDoc(doc(db, "SinauStudio", userInfo.name), {
+        id: userInfo.id,
+        name: userInfo.name,
       });
 
       for (let i = 0; i < scoreSecond.length; i++) {
-        const docRef =  await doc(db, "SinauStudio", "Hanhan");
+        const docRef = await doc(db, "SinauStudio", userInfo.name);
         const data = {
           [i + 1]: {
             score: scoreSecond[i],
@@ -53,9 +63,10 @@ const SinauMeet = () => {
         };
         updateDoc(docRef, data);
 
+        setIsLoading(true);
+
         setTimeout(() => {
-          navigate('/Home')
-          
+          navigate("/Home");
         }, 5000);
       }
     } catch (e) {
@@ -64,9 +75,6 @@ const SinauMeet = () => {
   };
 
   function onResults(results) {
-    // console.log(results);
-    //console.log(Facemesh.FACEMESH_RIGHT_EYE);
-
     //Setting height and width of canvas
     canvasRef.current.width = webcamRef.current.video.videoWidth;
     canvasRef.current.height = webcamRef.current.video.videoHeight;
@@ -204,75 +212,73 @@ const SinauMeet = () => {
 
   return (
     <>
-    <div className=" bg-black">
-      
-      <JitsiMeeting
-        domain="meet.jit.si"
-        roomName="Matematika Wajib"
-        configOverwrite={{
-          startWithAudioMuted: true,
-          disableModeratorIndicator: true,
-          startScreenSharing: true,
-          enableEmailInStats: false,
-        }}
-        interfaceConfigOverwrite={{
-          DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
-        }}
-        userInfo={{
-          displayName: "",
-        }}
-        onApiReady={(externalApi) => {
-          // here you can attach custom event listeners to the Jitsi Meet External API
-          // you can also store it locally to execute commands
-        }}
-        getIFrameRef={(iframeRef) => {
-          iframeRef.style.height = "600px" ;
-        }}
-      />
-      <Webcam
-        ref={webcamRef}
-        style={{
-          position: "absolute",
-          marginRight: "auto",
-          marginLeft: "auto",
-          left: "0",
-          right: "0",
-          textAlign: "center",
-          zIndex: "9",
-          width: 640,
-          height: 480,
-        }}
-        hidden
-      />
-      <canvas
-        hidden
-        ref={canvasRef}
-        style={{
-          position: "absolute",
-          marginRight: "auto",
-          marginLeft: "auto",
-          left: "0",
-          right: "0",
-          textAlign: "center",
-          zIndex: "9",
-          width: 640,
-          height: 480,
-        }}
-      ></canvas>
-      <div className=" flex justify-center mt-5 mb-5">
-        <button
-          onClick={getAverage}
-          type=""
-          className=" bg-blue-400 p-4 rounded-xl text-white"
-        >
-          End Session
-        </button>
+      <div className=" bg-black">
+        <JitsiMeeting
+          domain="meet.jit.si"
+          roomName="Matematika Wajib"
+          configOverwrite={{
+            startWithAudioMuted: true,
+            disableModeratorIndicator: true,
+            startScreenSharing: true,
+            enableEmailInStats: false,
+          }}
+          interfaceConfigOverwrite={{
+            DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
+          }}
+          userInfo={{
+            displayName: "",
+          }}
+          onApiReady={(externalApi) => {
+            // here you can attach custom event listeners to the Jitsi Meet External API
+            // you can also store it locally to execute commands
+          }}
+          getIFrameRef={(iframeRef) => {
+            iframeRef.style.height = "600px";
+          }}
+        />
+        <Webcam
+          ref={webcamRef}
+          style={{
+            position: "absolute",
+            marginRight: "auto",
+            marginLeft: "auto",
+            left: "0",
+            right: "0",
+            textAlign: "center",
+            zIndex: "9",
+            width: 640,
+            height: 480,
+          }}
+          hidden
+        />
+        <canvas
+          hidden
+          ref={canvasRef}
+          style={{
+            position: "absolute",
+            marginRight: "auto",
+            marginLeft: "auto",
+            left: "0",
+            right: "0",
+            textAlign: "center",
+            zIndex: "9",
+            width: 640,
+            height: 480,
+          }}
+        ></canvas>
+        <div className=" flex justify-center mt-5 mb-5">
+          <button
+            onClick={getAverage}
+            type=""
+            className="endsession bg-blue-400 p-4 rounded-xl text-white"
+          >
+            End Session
+          </button>
+        </div>
+        <div className=" flex">
+          <h1 className="average text-4xl text-black"></h1>
+        </div>
       </div>
-      <div className=" flex">
-        <h1 className="average text-4xl text-black"></h1>
-      </div>
-
-    </div>
     </>
   );
 };

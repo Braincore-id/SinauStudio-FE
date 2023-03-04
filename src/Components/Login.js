@@ -1,40 +1,47 @@
 import axios from "axios";
-import React,{ useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useCookies } from "react-cookie";
 import { redirect, useNavigate } from "react-router-dom";
-
-
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const [user] = useState("");
-  const apiURL = 'https://a025-2001-448a-2003-6db8-e946-22f3-cf3c-58dd.ap.ngrok.io/api/v.1';
-  const navigate = useNavigate()
-   const [cookies, setCookie] = useCookies(['name']);
+  const navigate = useNavigate();
+  const [cookies, setCookie] = useCookies(["token"]);
 
+  const apiURL =
+    "https://a025-2001-448a-2003-6db8-e946-22f3-cf3c-58dd.ap.ngrok.io/api/v.1";
+
+  useEffect(() => {
+    if (cookies.token) {
+      navigate("/Home");
+    } else {
+      navigate("/");
+    }
+  }, [cookies.token]);
 
   async function handleSubmit() {
     try {
       await axios
-        .post(
-          `${apiURL}/auth/login`,
-          {
-            email: email,
-            password: password,
-          }
-        )
+        .post(`${apiURL}/auth/login`, {
+          email: email,
+          password: password,
+        })
         .then((response) => {
-          console.log(response.data)
-          
-          navigate('/Home')
+          const token = response.data.data.token;
+          if (token != null) {
+            setCookieJWT(token);
+            navigate("/Home");
+          }
         });
     } catch (e) {
       console.log(e);
     }
   }
 
+  const setCookieJWT = (token) => {
+    setCookie("token", token);
+  };
 
   return (
     <>
@@ -109,8 +116,8 @@ const Login = () => {
 
                 <div class="mb-6">
                   <input
-                  autoComplete="off"
-                  required
+                    autoComplete="off"
+                    required
                     onChange={(e) => setEmail(e.target.value)}
                     type="text"
                     class="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
@@ -121,9 +128,9 @@ const Login = () => {
 
                 <div class="mb-6">
                   <input
-                  onChange={(e) => setPassword(e.target.value)}
-                  required
-                  autoComplete="off"
+                    onChange={(e) => setPassword(e.target.value)}
+                    required
+                    autoComplete="off"
                     type="password"
                     class="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
                     id="exampleFormControlInput2"
@@ -152,7 +159,7 @@ const Login = () => {
 
                 <div class="text-center">
                   <button
-                  onClick={handleSubmit}
+                    onClick={handleSubmit}
                     type="button"
                     class="inline-block px-7 py-3 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                   >
@@ -162,7 +169,7 @@ const Login = () => {
                     Don't have an account?
                     <a
                       href="/Signup"
-                      class="text-red-600 hover:text-red-700 focus:text-red-700 transition duration-200 ease-in-out"
+                      class="ml-1 text-red-600 hover:text-red-700 focus:text-red-700 transition duration-200 ease-in-out"
                     >
                       Register
                     </a>
@@ -176,4 +183,4 @@ const Login = () => {
     </>
   );
 };
-export default Login
+export default Login;

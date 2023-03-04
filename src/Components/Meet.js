@@ -1,28 +1,29 @@
 import React from "react";
 import Navbar from "./Navbar";
-import { BiCaretLeft } from "react-icons/bi";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
 const Meet = () => {
   const navigate = useNavigate();
-  const apiURL = `https://7805-114-124-212-33.ap.ngrok.io/download_report/Matematika_WajibFarhan_20230304-094827.xls`
+  const apiURL = `https://7805-114-124-212-33.ap.ngrok.io/download_report/Matematika_WajibFarhan_20230304-094827.xls`;
 
-  const flaskSubmit = async() => {
+  const flaskSubmit = async () => {
     axios({
       url: apiURL,
-      method: 'GET',
-      responseType: 'blob' // agar data diterima sebagai blob bukan json
-    }).then(response => {
+      method: "GET",
+      responseType: "blob", // agar data diterima sebagai blob bukan json
+    }).then((response) => {
       const url = window.URL.createObjectURL(new Blob([response.data]));
-      const link = document.createElement('a');
+      const link = document.createElement("a");
       link.href = url;
-      link.setAttribute('download', 'Matematika_WajibFarhan_20230304-094827.xls'); //nama file untuk diunduh
+      link.setAttribute(
+        "download",
+        "Matematika_WajibFarhan_20230304-094827.xls"
+      ); //nama file untuk diunduh
       document.body.appendChild(link);
       link.click();
     });
-  }
-
+  };
 
   return (
     <>
@@ -64,7 +65,7 @@ const Meet = () => {
             <div className=" pt-5 pb-5">
               <h1 className=" text-center ">VIDEO MEET</h1>
             </div>
-           
+
             <div className="divider py-10 px-10">On Going</div>
             <div className="flex flex-col items-center gap-5">
               <button
@@ -104,9 +105,9 @@ const Meet = () => {
                 Matematika Wajib
               </button>
               <button
-              class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
-              onClick={flaskSubmit}>
-                
+                class="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded inline-flex items-center"
+                onClick={flaskSubmit}
+              >
                 <svg
                   class="fill-current w-4 h-4 mr-2"
                   xmlns="http://www.w3.org/2000/svg"

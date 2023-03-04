@@ -1,40 +1,35 @@
 "use client";
 
-
 import React, { useState } from "react";
 import { redirect, useNavigate } from "react-router-dom";
 import axios from "axios";
-
 
 const Signup = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [Error, setError] = useState("");
-  const apiURL = 'https://a025-2001-448a-2003-6db8-e946-22f3-cf3c-58dd.ap.ngrok.io/api/v.1'
-  const navigate = useNavigate()
+  const apiURL =
+    "https://a025-2001-448a-2003-6db8-e946-22f3-cf3c-58dd.ap.ngrok.io/api/v.1";
+  const navigate = useNavigate();
 
   async function handleSubmit(e) {
-  e.preventDefault();
-  setError('');
-  try {
-    const response = await axios.post(
-      `${apiURL}/auth/register`,
-      {
+    e.preventDefault();
+    setError("");
+    try {
+      const response = await axios.post(`${apiURL}/auth/register`, {
         email: email,
         password: password,
-        name: 'farhan wildan',
-        role: 'mahasiswa',
-        npm: '234235',
-        kode_kelas: "ASUDGASD"
-      }, 
-    );
-    console.log(response.data);
-    navigate('/login')
-
-  } catch (error) {
-    console.log(error);
+        name: "farhan wildan",
+        role: "mahasiswa",
+        npm: "234235",
+        kode_kelas: "ASUDGASD",
+      });
+      console.log(response.data);
+      navigate("/login");
+    } catch (error) {
+      console.log(error);
+    }
   }
-}
 
   return (
     <div>
@@ -127,40 +122,21 @@ const Signup = () => {
                   />
                 </div>
 
-                <div class="flex justify-between items-center mb-6">
-                  <div class="form-group form-check">
-                    <input
-                      type="checkbox"
-                      class="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
-                      id="exampleCheck2"
-                    />
-                    <label
-                      class="form-check-label inline-block text-gray-800"
-                      for="exampleCheck2"
-                    >
-                      Remember me
-                    </label>
-                  </div>
-                  <a href="#!" class="text-gray-800">
-                    Forgot password?
-                  </a>
-                </div>
-
                 <div class="text-center">
                   <button
-                  onClick={handleSubmit}
+                    onClick={handleSubmit}
                     type="button"
                     class="inline-block px-7 py-3 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
                   >
-                    Login
+                    Register
                   </button>
                   <p class="text-sm font-semibold mt-2 pt-1 mb-0">
-                    Don't have an account?
+                    Already have an account?
                     <a
                       href="/"
-                      class="text-red-600 hover:text-red-700 focus:text-red-700 transition duration-200 ease-in-out"
+                      class="ml-1 text-red-600 hover:text-red-700 focus:text-red-700 transition duration-200 ease-in-out"
                     >
-                      LOGIN
+                      Login
                     </a>
                   </p>
                 </div>
