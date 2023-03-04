@@ -17,6 +17,7 @@ const SinauMeet = () => {
   const connect = window.drawConnectors;
   const [usingExternalCam, setUsingExternalCam] = useState(false);
   const navigate = useNavigate()
+  const [isLoading, setIsLoading] = useState(false);
 
   const euclideanDistance = (point1, point2) => {
     const a = point1.x - point2.x;
@@ -54,7 +55,8 @@ const SinauMeet = () => {
 
         setTimeout(() => {
           navigate('/Home')
-        }, 10000);
+          
+        }, 5000);
       }
     } catch (e) {
       console.log(e);
@@ -269,6 +271,7 @@ const SinauMeet = () => {
       <div className=" flex">
         <h1 className="average text-4xl text-black"></h1>
       </div>
+
     </div>
     </>
   );
