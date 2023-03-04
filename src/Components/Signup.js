@@ -2,7 +2,7 @@
 
 
 import React, { useState } from "react";
-import { redirect } from "react-router-dom";
+import { redirect, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 
@@ -11,6 +11,7 @@ const Signup = () => {
   const [password, setPassword] = useState("");
   const [Error, setError] = useState("");
   const apiURL = 'https://a025-2001-448a-2003-6db8-e946-22f3-cf3c-58dd.ap.ngrok.io/api/v.1'
+  const navigate = useNavigate()
 
   async function handleSubmit(e) {
   e.preventDefault();
@@ -28,7 +29,7 @@ const Signup = () => {
       }, 
     );
     console.log(response.data);
-    redirect('/Login')
+    navigate('/login')
 
   } catch (error) {
     console.log(error);
@@ -37,15 +38,15 @@ const Signup = () => {
 
   return (
     <div>
-      <section class="h-screen">
+      <section class="h-screen bg-white">
         <div class="px-6 h-full text-gray-800">
           <div class="flex xl:justify-center lg:justify-between justify-center items-center flex-wrap h-full g-6">
             <div class="xl:ml-20 xl:w-5/12 lg:w-5/12 md:w-8/12 mb-12 md:mb-0">
               <div className=" mb-10">
-                <h1 className=" text-4xl">SIGN UP</h1>
+                <h1 className=" text-4xl text-center">SIGN UP</h1>
               </div>
               <form onSubmit={handleSubmit}>
-                <div class="flex flex-row items-center justify-center lg:justify-start">
+                <div class="flex flex-row items-center justify-center">
                   <p class="text-lg mb-0 mr-4">Sign in with</p>
                   <button
                     type="button"
@@ -145,7 +146,7 @@ const Signup = () => {
                   </a>
                 </div>
 
-                <div class="text-center lg:text-left">
+                <div class="text-center">
                   <button
                   onClick={handleSubmit}
                     type="button"

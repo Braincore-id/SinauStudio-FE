@@ -6,6 +6,9 @@ import { FaceMesh } from "@mediapipe/face_mesh";
 import * as Facemesh from "@mediapipe/face_mesh";
 import "@tensorflow/tfjs";
 import "@tensorflow/tfjs-backend-webgl";
+import db from "./Firebase";
+import { doc, updateDoc, setDoc } from "@firebase/firestore";
+import { useNavigate } from "react-router-dom";
 
 const SinauMeet = () => {
   const webcamRef = useRef(null);
@@ -29,11 +32,33 @@ const SinauMeet = () => {
 
   let scoreSecond = [];
 
-  const getAverage = () => {
-    const avg = scoreSecond.reduce((a, b) => a + b, 0) / scoreSecond.length;
-    console.log(`Average: ${avg}`);
-    const averageElement = document.querySelector(".average");
-    averageElement.textContent = `Average: ${avg}`;
+  const getAverage = async () => {
+    try {
+      const avg = scoreSecond.reduce((a, b) => a + b, 0) / scoreSecond.length;
+      const averageElement = document.querySelector(".average");
+      averageElement.textContent = `Average: ${avg}`;
+
+      await setDoc(doc(db, "SinauStudio", "Hanhan"), {
+        name: "Hanhan",
+      });
+
+      for (let i = 0; i < scoreSecond.length; i++) {
+        const docRef =  await doc(db, "SinauStudio", "Hanhan");
+        const data = {
+          [i + 1]: {
+            score: scoreSecond[i],
+            second: i + 1,
+          },
+        };
+        updateDoc(docRef, data);
+
+        setTimeout(() => {
+          navigate('/Home')
+        }, 10000);
+      }
+    } catch (e) {
+      console.log(e);
+    }
   };
 
   function onResults(results) {
@@ -177,9 +202,11 @@ const SinauMeet = () => {
 
   return (
     <>
+    <div className=" bg-black">
+      
       <JitsiMeeting
         domain="meet.jit.si"
-        roomName="PleaseUseAGoodRoomName"
+        roomName="Matematika Wajib"
         configOverwrite={{
           startWithAudioMuted: true,
           disableModeratorIndicator: true,
@@ -190,14 +217,14 @@ const SinauMeet = () => {
           DISABLE_JOIN_LEAVE_NOTIFICATIONS: true,
         }}
         userInfo={{
-          displayName: "farhan",
+          displayName: "",
         }}
         onApiReady={(externalApi) => {
           // here you can attach custom event listeners to the Jitsi Meet External API
           // you can also store it locally to execute commands
         }}
         getIFrameRef={(iframeRef) => {
-          iframeRef.style.height = "800px";
+          iframeRef.style.height = "600px" ;
         }}
       />
       <Webcam
@@ -230,30 +257,19 @@ const SinauMeet = () => {
           height: 480,
         }}
       ></canvas>
-      <button
-        style={{
-          position: "absolute",
-          bottom: "20px",
-          background: "transparent",
-          textAlign: "center",
-          zIndex: "11",
-        }}
-        onClick={() => setUsingExternalCam(!usingExternalCam)}
-      >
-        Change Camera
-      </button>
-      <div className=" flex">
+      <div className=" flex justify-center mt-5 mb-5">
         <button
           onClick={getAverage}
           type=""
           className=" bg-blue-400 p-4 rounded-xl text-white"
         >
-          get average
+          End Session
         </button>
       </div>
       <div className=" flex">
         <h1 className="average text-4xl text-black"></h1>
       </div>
+    </div>
     </>
   );
 };

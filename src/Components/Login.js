@@ -35,15 +35,15 @@ const Login = () => {
 
   return (
     <>
-      <section class="h-screen">
+      <section class="h-screen bg-white">
         <div class="px-6 h-full text-gray-800">
           <div class="flex xl:justify-center lg:justify-between justify-center items-center flex-wrap h-full g-6">
             <div class="xl:ml-20 xl:w-5/12 lg:w-5/12 md:w-8/12 mb-12 md:mb-0">
               <div className=" mb-10">
-                <h1 className=" text-4xl">SIGN IN</h1>
+                <h1 className=" text-4xl text-center">SIGN IN</h1>
               </div>
               <form onSubmit={handleSubmit}>
-                <div class="flex flex-row items-center justify-center lg:justify-start">
+                <div class="flex flex-row items-center justify-center">
                   <p class="text-lg mb-0 mr-4">Sign in with</p>
                   <button
                     type="button"
@@ -147,7 +147,7 @@ const Login = () => {
                   </a>
                 </div>
 
-                <div class="text-center lg:text-left">
+                <div class="text-center">
                   <button
                   onClick={handleSubmit}
                     type="button"
