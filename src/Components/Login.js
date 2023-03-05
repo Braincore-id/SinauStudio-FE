@@ -17,7 +17,8 @@ const Login = () => {
       navigate("/Home");
     } else {
       navigate("/");
-    }
+    };
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cookies.token]);
 
   async function handleSubmit() {
@@ -29,6 +30,7 @@ const Login = () => {
         })
         .then((response) => {
           const token = response.data.data.token;
+          console.log(token)
           if (token != null) {
             setCookieJWT(token);
             navigate("/Home");
@@ -42,6 +44,7 @@ const Login = () => {
   const setCookieJWT = (token) => {
     setCookie("token", token);
   };
+  
 
   return (
     <>
